@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.math.BigInteger;
+import java.text.ChoiceFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.lang.Object.*;
@@ -21,7 +22,7 @@ public class CipherFrame extends JFrame implements ActionListener {
     private  JFormattedTextField  rMod;
     private byte[] txt;
     File file;
-    private int E ,p,q,r,x;
+    private int E, key,p,q,r,x;
     private boolean isOkay;
     CipherFrame() {
 
@@ -45,6 +46,7 @@ public class CipherFrame extends JFrame implements ActionListener {
             e.printStackTrace();
         }
         NumberFormat format = NumberFormat.getInstance();
+        format.setGroupingUsed(false);
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
         formatter.setMinimum(0);
@@ -112,6 +114,7 @@ public int ingetQ(){
             p = Integer.parseInt(qValue.getText());
             q = Integer.parseInt(pValue.getText());
             E = Integer.parseInt(eValue.getText());
+            key = Integer.parseInt(rMod.getText());
             x = Math.EulerFunc(p,q);
             r = p*q;
             isOkay = true;
@@ -119,17 +122,18 @@ public int ingetQ(){
                 JOptionPane.showMessageDialog(null, "Number are not relatively prime");
 
             } else{
-                JOptionPane.showMessageDialog(null, "Number are relatively prime");
+              //  JOptionPane.showMessageDialog(null, "Number are relatively prime");
                 int[] c =Math.gcd(x,E);
                 int d = c[2];
-                JOptionPane.showMessageDialog(null, Integer.toString(d));
+                //JOptionPane.showMessageDialog(null, Integer.toString(d));
                 baos = new ByteArrayOutputStream();
                 dos = new DataOutputStream(baos);
 
-                if (getFileExtension(file).equals("coded")){
+                if (getFileExtension(file).equals(".coded")){
+                    d = Integer.parseInt(qValue.getText());
                     String path = getOutDecodePath(fileChooser.getSelectedFile().getPath());
                     try (FileOutputStream fos = new FileOutputStream(path)) {
-                        fos.write(RSA.decrypt(d,r,new short[]{16, 29, 21}));
+                        fos.write(RSA.decrypt(d,key,toShortArray(RSA.readfile(fileChooser.getSelectedFile()))));
                         //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -138,7 +142,7 @@ public int ingetQ(){
                 } else{
                     String path = getOutEncodePath(fileChooser.getSelectedFile().getPath());
                     try (FileOutputStream fos = new FileOutputStream(path)) {
-                        fos.write( toByteArray(RSA.encrypt(E,r,new byte[] {4,2,21})));
+                        fos.write( toByteArray(RSA.encrypt(E,r,RSA.readfile(fileChooser.getSelectedFile()))));
                         //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -149,6 +153,14 @@ public int ingetQ(){
 
             }
         }
+    }
+    private short[] toShortArray(byte[] lol){
+        short kek[] = new short[lol.length];
+        for (int i = 0; i < lol.length; i++) {
+            kek[i] = (short)lol[i];
+
+        }
+        return kek;
     }
     private byte[] toByteArray(short[] lol){
         byte kek[] = new byte[lol.length*2];
@@ -184,7 +196,6 @@ public int ingetQ(){
         CipherFrame cf = new CipherFrame();
 
 
-        BigInteger bigInteger = new BigInteger("0");
 
         JOptionPane.showMessageDialog(null, Arrays.toString(Math.gcd(32,150)));
 
