@@ -16,6 +16,7 @@ public class CipherFrame extends JFrame implements ActionListener {
     JFileChooser fileChooser;
     private JFormattedTextField  qValue;
     private JFormattedTextField  pValue;
+    private JFormattedTextField  KcValue;
     ByteArrayOutputStream baos = null;
     DataOutputStream dos = null;
     private JFormattedTextField  eValue;
@@ -32,7 +33,7 @@ public class CipherFrame extends JFrame implements ActionListener {
         this.setBounds(100, 100, 640, 320);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Container container = this.getContentPane();
-        container.setLayout(new GridLayout(10, 4,5,5));
+        container.setLayout(new GridLayout(12, 6,5,5));
         fileChooser = new JFileChooser(System.getProperty("user.home"));
         File workingDirectory = new File(System.getProperty("user.dir"));
         fileChooser.setCurrentDirectory(workingDirectory);
@@ -62,15 +63,17 @@ public class CipherFrame extends JFrame implements ActionListener {
         encrypt.addActionListener(this);
 
         rMod = new JFormattedTextField(formatter);
-        rMod.setText("Rmod");
-
+        rMod.setText("0");
         eValue = new JFormattedTextField(formatter);
         eValue.setText("7");
+        KcValue = new JFormattedTextField(formatter);
+        KcValue.setText("7");
 
         pValue = new JFormattedTextField(formatter);
         pValue.setText("3");
         qValue = new JFormattedTextField(formatter);
         qValue.setText("11");
+
 
         // container.add(fileChooser);
         container.add(openFile);
@@ -82,9 +85,10 @@ public class CipherFrame extends JFrame implements ActionListener {
         container.add(qValue);
 
         container.add(encrypt);
-        add(new JLabel("eValue"));
+        add(new JLabel("K oткр"));
         container.add(eValue);
-
+        add(new JLabel("K cекретный"));
+        container.add(KcValue);
         this.setVisible(true);
 
     }
@@ -111,17 +115,28 @@ public int ingetQ(){
             }
         }
         if ("Encrypt".equals(e.getActionCommand())) {
+
             p = Integer.parseInt(qValue.getText());
             q = Integer.parseInt(pValue.getText());
             E = Integer.parseInt(eValue.getText());
             key = Integer.parseInt(rMod.getText());
             x = Math.EulerFunc(p,q);
+
+
+
             r = p*q;
             isOkay = true;
+            if (!Math.CheckSimple(E, x)){
+                JOptionPane.showMessageDialog(null, "E and X are not relatively prime");
+            }
+            if ((E<1)||(E>x)){
+                JOptionPane.showMessageDialog(null, "invalid e");
+            }
             if (!Math.CheckSimple(p,q)||(!Math.CheckSimple(E, x))||(E<1)||(E>x)){
                 JOptionPane.showMessageDialog(null, "Number are not relatively prime");
 
-            } else{
+            }
+            else{
               //  JOptionPane.showMessageDialog(null, "Number are relatively prime");
                 int[] c =Math.gcd(x,E);
                 int d = c[2];
@@ -143,6 +158,7 @@ public int ingetQ(){
                     String path = getOutEncodePath(fileChooser.getSelectedFile().getPath());
                     try (FileOutputStream fos = new FileOutputStream(path)) {
                         fos.write( toByteArray(RSA.encrypt(E,r,RSA.readfile(fileChooser.getSelectedFile()))));
+                        KcValue.setText(String.valueOf(c[2]));
                         //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
                     } catch (IOException e1) {
                         e1.printStackTrace();
