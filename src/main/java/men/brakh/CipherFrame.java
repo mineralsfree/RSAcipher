@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ChoiceFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -63,16 +65,16 @@ public class CipherFrame extends JFrame implements ActionListener {
         encrypt.addActionListener(this);
 
         rMod = new JFormattedTextField(formatter);
-        rMod.setText("0");
+        rMod.setText("2419");
         eValue = new JFormattedTextField(formatter);
-        eValue.setText("7");
+        eValue.setText("157");
         KcValue = new JFormattedTextField(formatter);
-        KcValue.setText("7");
+        KcValue.setText("133");
 
         pValue = new JFormattedTextField(formatter);
-        pValue.setText("3");
+        pValue.setText("41");
         qValue = new JFormattedTextField(formatter);
-        qValue.setText("11");
+        qValue.setText("59");
 
 
         // container.add(fileChooser);
@@ -121,7 +123,7 @@ public int ingetQ(){
             E = Integer.parseInt(eValue.getText());
             key = Integer.parseInt(rMod.getText());
             x = Math.EulerFunc(p,q);
-
+            int secretKey = Integer.parseInt(KcValue.getText());
 
 
             r = p*q;
@@ -144,11 +146,14 @@ public int ingetQ(){
                 baos = new ByteArrayOutputStream();
                 dos = new DataOutputStream(baos);
 
+
+
+
                 if (getFileExtension(file).equals(".coded")){
                     d = Integer.parseInt(qValue.getText());
                     String path = getOutDecodePath(fileChooser.getSelectedFile().getPath());
                     try (FileOutputStream fos = new FileOutputStream(path)) {
-                        fos.write(RSA.decrypt(d,key,toShortArray(RSA.readfile(fileChooser.getSelectedFile()))));
+                        fos.write(RSA.decrypt(secretKey,key,toShortArray(RSA.readfile(fileChooser.getSelectedFile()))));
                         //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -157,7 +162,7 @@ public int ingetQ(){
                 } else{
                     String path = getOutEncodePath(fileChooser.getSelectedFile().getPath());
                     try (FileOutputStream fos = new FileOutputStream(path)) {
-                        fos.write( toByteArray(RSA.encrypt(E,r,RSA.readfile(fileChooser.getSelectedFile()))));
+                        fos.write(toByteArray(RSA.encrypt(E,r,RSA.readfile(fileChooser.getSelectedFile()))));
                         KcValue.setText(String.valueOf(c[2]));
                         //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
                     } catch (IOException e1) {
@@ -172,19 +177,27 @@ public int ingetQ(){
     }
     private short[] toShortArray(byte[] lol){
         short kek[] = new short[lol.length];
-        for (int i = 0; i < lol.length; i++) {
-            kek[i] = (short)lol[i];
-
+        int j=0;
+        for (int i = 0; i < lol.length; i+=2) {
+            int r = lol[i] & 0xFF;
+            r = (r << 8) | (lol[i+1] & 0xFF);
+            kek[j]=(short) r;
+            j++;
         }
         return kek;
+
     }
-    private byte[] toByteArray(short[] lol){
-        byte kek[] = new byte[lol.length*2];
-        for (int i=0;i<lol.length;i++){
-            kek[i] = (byte)(lol[i] & 0xff);
-            kek[i+1] = (byte)((lol[i] >> 8) & 0xff);
+    private byte [] toByteArray(short [] kek)
+    {
+        byte lol[] = new byte [kek.length*2];
+        int j=0;
+        for (int i = 0; i <kek.length*2; i+=2) { 
+            lol[i+1] = (byte)(kek[j] & 0xff);
+            lol[i] = (byte)((kek[j] >> 8) & 0xff);
+            j++;
         }
-        return kek;    }
+    return lol;
+    }
     private String getOutEncodePath(String filePath) {
         return filePath + ".coded";
     }
@@ -213,7 +226,7 @@ public int ingetQ(){
 
 
 
-        JOptionPane.showMessageDialog(null, Arrays.toString(Math.gcd(32,150)));
+    //    JOptionPane.showMessageDialog(null, Arrays.toString(Math.gcd(32,150)));
 
 
     }

@@ -14,6 +14,7 @@ public class RSA {
         Path filePath = Paths.get(file.getAbsolutePath());
         return Files.readAllBytes(filePath);
 
+
     }
     public static String getDecimaltext(byte[] c, int size ){
 
@@ -52,11 +53,13 @@ public class RSA {
         return d;
     }
     static byte[] decrypt(int d, int r,short[] cipherText){
+
         byte[] m = new byte[cipherText.length];
         for(int i =0;i<cipherText.length;i++){
             m[i] = (byte)Math.pow(cipherText[i],d,r);
         }
-        System.out.println(getDecimaltext(m,5));
+        System.out.println("Decoded "+  getDecimaltext(m,50));
+        System.out.println("Ciphered " + getDecimaltext(cipherText,50));
         return m;
 
     }
