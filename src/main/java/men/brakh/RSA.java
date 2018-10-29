@@ -24,15 +24,15 @@ public class RSA {
         StringBuilder sb = new StringBuilder();
 
         for (int i=0;i<size;i++){
-            sb.append(c[i]);
+            sb.append(Byte.toUnsignedInt(c[i]));
             sb.append(" ");
 
         }
-        return sb.toString();
-    }
-    public static String getDecimaltext(short[] c, int size ){
+            return sb.toString();
+        }
+        public static String getDecimaltext(short[] c, int size ){
 
-        if (c.length<size){
+            if (c.length<size){
             size = c.length;
         }
         StringBuilder sb = new StringBuilder();
@@ -47,7 +47,7 @@ public class RSA {
     public static short[] encrypt(int e, int r,byte[] plaintext){
         short[] d = new short[plaintext.length];
         for(int i =0;i<plaintext.length;i++){
-            d[i] = (short)Math.pow(plaintext[i],e,r);
+            d[i] = (short)Math.pow(Byte.toUnsignedInt(plaintext[i]),e,r);
         }
         System.out.println(getDecimaltext(d,5));
         return d;
@@ -56,7 +56,7 @@ public class RSA {
 
         byte[] m = new byte[cipherText.length];
         for(int i =0;i<cipherText.length;i++){
-            m[i] = (byte)Math.pow(cipherText[i],d,r);
+            m[i] = (byte)Math.pow(Short.toUnsignedInt(cipherText[i]),d,r);
         }
         System.out.println("Decoded "+  getDecimaltext(m,50));
         System.out.println("Ciphered " + getDecimaltext(cipherText,50));
