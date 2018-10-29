@@ -6,21 +6,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.text.ChoiceFormat;
+
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.lang.Object.*;
 
 public class CipherFrame extends JFrame implements ActionListener {
     JFileChooser fileChooser;
     private JFormattedTextField  qValue;
     private JFormattedTextField  pValue;
     private JFormattedTextField  KcValue;
-    ByteArrayOutputStream baos = null;
-    DataOutputStream dos = null;
+
     private JFormattedTextField  eValue;
     private  JFormattedTextField  rMod;
     private byte[] txt;
@@ -65,11 +60,11 @@ public class CipherFrame extends JFrame implements ActionListener {
         encrypt.addActionListener(this);
 
         rMod = new JFormattedTextField(formatter);
-        rMod.setText("2419");
+        rMod.setText("0");
         eValue = new JFormattedTextField(formatter);
         eValue.setText("157");
         KcValue = new JFormattedTextField(formatter);
-        KcValue.setText("133");
+        KcValue.setText("0");
 
         pValue = new JFormattedTextField(formatter);
         pValue.setText("41");
@@ -94,12 +89,6 @@ public class CipherFrame extends JFrame implements ActionListener {
         this.setVisible(true);
 
     }
-public int ingetQ(){
-        return q;
-}
-    public int ingetP(){
-        return p;
-    }
 
     public void actionPerformed(ActionEvent e) {
         if ("openFile".equals(e.getActionCommand())) {
@@ -108,7 +97,7 @@ public int ingetQ(){
                 file = fileChooser.getSelectedFile();
                 try {
                     txt = RSA.readfile(file);
-                    System.out.println(RSA.getDecimaltext(txt,5));
+                    System.out.println("File content: " +RSA.getDecimaltext(txt,5));
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -117,62 +106,65 @@ public int ingetQ(){
             }
         }
         if ("Encrypt".equals(e.getActionCommand())) {
-
-            p = Integer.parseInt(qValue.getText());
-            q = Integer.parseInt(pValue.getText());
-            E = Integer.parseInt(eValue.getText());
-            key = Integer.parseInt(rMod.getText());
-            x = Math.EulerFunc(p,q);
-            int secretKey = Integer.parseInt(KcValue.getText());
-
-
-            r = p*q;
-            isOkay = true;
-            if (!Math.CheckSimple(E, x)){
-                JOptionPane.showMessageDialog(null, "E and X are not relatively prime");
-            }
-            if ((E<1)||(E>x)){
-                JOptionPane.showMessageDialog(null, "invalid e");
-            }
-            if (!Math.CheckSimple(p,q)||(!Math.CheckSimple(E, x))||(E<1)||(E>x)){
-                JOptionPane.showMessageDialog(null, "Number are not relatively prime");
-
-            }
-            else{
-              //  JOptionPane.showMessageDialog(null, "Number are relatively prime");
-                int[] c =Math.gcd(x,E);
-                int d = c[2];
-                //JOptionPane.showMessageDialog(null, Integer.toString(d));
-                baos = new ByteArrayOutputStream();
-                dos = new DataOutputStream(baos);
-
-
-
-
-                if (getFileExtension(file).equals(".coded")){
-                    d = Integer.parseInt(qValue.getText());
-                    String path = getOutDecodePath(fileChooser.getSelectedFile().getPath());
-                    try (FileOutputStream fos = new FileOutputStream(path)) {
-                        fos.write(RSA.decrypt(secretKey,key,toShortArray(RSA.readfile(fileChooser.getSelectedFile()))));
-                        //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-
-                } else{
-                    String path = getOutEncodePath(fileChooser.getSelectedFile().getPath());
-                    try (FileOutputStream fos = new FileOutputStream(path)) {
-                        fos.write(toByteArray(RSA.encrypt(E,r,RSA.readfile(fileChooser.getSelectedFile()))));
-                        KcValue.setText(String.valueOf(c[2]));
-                        //fos.close(); There is no more need for this line since you had created the instance of "fos" inside the try. And this will automatically close the OutputStream
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-
-                }
+             if (file!=null){
+                 if (getFileExtension(file).equals(".coded")) {
+                     key = Integer.parseInt(rMod.getText());
+                     int secretKey = Integer.parseInt(KcValue.getText());
+                     String path = getOutDecodePath(fileChooser.getSelectedFile().getPath());
+                     try (FileOutputStream fos = new FileOutputStream(path)) {
+                         fos.write(RSA.decrypt(secretKey, key, toShortArray(RSA.readfile(fileChooser.getSelectedFile()))));
+                     } catch (IOException e1) {
+                         e1.printStackTrace();
+                     }
+                 } else {
+                     p = Integer.parseInt(qValue.getText());
+                     q = Integer.parseInt(pValue.getText());
+                     E = Integer.parseInt(eValue.getText());
+                     key = Integer.parseInt(rMod.getText());
+                     x = Math.EulerFunc(p, q);
+                     r = p * q;
+                     rMod.setText(String.valueOf(r));
+                     isOkay = true;
+                     if (!Math.CheckSimple(E, x)) {
+                         JOptionPane.showMessageDialog(null, "eValue and EulerFunc(p, q) are not relatively prime");
+                         isOkay= false;
+                     }
+                     if ((E < 1) || (E > x)) {
+                         JOptionPane.showMessageDialog(null, "invalid e");
+                         isOkay= false;
+                     }
+                     if (!Math.CheckSimple(p, q)) {
+                         JOptionPane.showMessageDialog(null, "(p, q) are not relatively prime");
+                         isOkay= false;
 
 
-            }
+                     } if (r<=256){
+                         JOptionPane.showMessageDialog(null, "mod key part must be at least BYTE_MAX_VALUE +1");
+                         isOkay= false;
+                     }
+                     if (isOkay) {
+                         int[] c = Math.gcd(x, E); // euler function, public key
+                         System.out.println("GCD" + Arrays.toString(c));
+                         {
+                             String path = getOutEncodePath(fileChooser.getSelectedFile().getPath());
+                             try (FileOutputStream fos = new FileOutputStream(path)) {
+                                 fos.write(toByteArray(RSA.encrypt(E, r, RSA.readfile(fileChooser.getSelectedFile()))));
+                                 KcValue.setText(String.valueOf(c[2]));
+                             } catch (IOException e1) {
+                                 e1.printStackTrace();
+                             }
+
+                         }
+
+
+                     }
+                     else{
+                         JOptionPane.showMessageDialog(null, "encryption aborted");
+                     }
+                 }
+        } else{
+                 JOptionPane.showMessageDialog(null, "You haven't specified file => encryption aborted");
+             }
         }
     }
     private short[] toShortArray(byte[] lol){

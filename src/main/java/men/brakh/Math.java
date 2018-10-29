@@ -30,11 +30,11 @@ public class Math {
         int y1 = 1;
         int d2,q,x2,y2;
         while (d1>1){
-            q = d0/d1;
-            d2 = d0%d1;
+            q = d0/d1;// делим нацело
+            d2 = d0%d1;//остаток от деления
             x2 = x0-q*x1;
             y2 = y0-q*y1;
-            d0 = d1; d1 = d2;
+            d0 = d1; d1 = d2; //a = b; b = остаток от деления
             x0 = x1; x1=x2;
             y0 = y1; y1=y2;
         }
