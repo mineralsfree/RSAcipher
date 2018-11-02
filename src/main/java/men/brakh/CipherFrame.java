@@ -82,9 +82,9 @@ public class CipherFrame extends JFrame implements ActionListener {
         container.add(qValue);
 
         container.add(encrypt);
-        add(new JLabel("K oткр"));
-        container.add(eValue);
         add(new JLabel("K cекретный"));
+        container.add(eValue);
+        add(new JLabel("K oткр"));
         container.add(KcValue);
         this.setVisible(true);
 
@@ -133,8 +133,8 @@ public class CipherFrame extends JFrame implements ActionListener {
                          JOptionPane.showMessageDialog(null, "invalid e");
                          isOkay= false;
                      }
-                     if (!Math.CheckSimple(p, q)) {
-                         JOptionPane.showMessageDialog(null, "(p, q) are not relatively prime");
+                     if (!Math.isPrime(p)||!Math.isPrime(q)) {
+                         JOptionPane.showMessageDialog(null, "p, q are relatively prime");
                          isOkay= false;
 
 

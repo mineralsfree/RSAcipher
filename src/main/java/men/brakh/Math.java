@@ -10,7 +10,7 @@ public class Math {
         }
         return res;
     }
-    //  return array [d, a, b] such that d = gcd(p, q), ap + bq = d
+    //  return array [d, a, b] such that d = gcd(p, q), ap + b q = d
     static int[] gcd(int p, int q) {
         if (q == 0)
             return new int[] { p, 1, 0 };
@@ -52,6 +52,17 @@ public class Math {
         if (n > 1)
             result -= result / n;
         return result;
+    }
+    public static boolean isPrime(int num)
+    {
+        if (num == 2)
+            return true;
+        if (num < 2 || num % 2 == 0)
+            return false;
+        for (int i = 3; i * i <= num; i += 2)
+            if (num % i == 0)
+                return false;
+        return true;
     }
     public static long gcd(long a, long b){
         if(b==0)
