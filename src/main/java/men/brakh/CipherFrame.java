@@ -138,7 +138,7 @@ public class CipherFrame extends JFrame implements ActionListener {
                          isOkay= false;
 
 
-                     } if (r<=256){
+                     } if ((r<=255)|| (r>32767)){
                          JOptionPane.showMessageDialog(null, "mod key part must be at least BYTE_MAX_VALUE +1");
                          isOkay= false;
                      }
