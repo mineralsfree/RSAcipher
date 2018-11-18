@@ -49,7 +49,7 @@ public class RSA {
         for(int i =0;i<plaintext.length;i++){
             d[i] = (short)Math.pow(Byte.toUnsignedInt(plaintext[i]),e,r);
         }
-        System.out.println(getDecimaltext(d,5));
+        System.out.println( "Coded: " + getDecimaltext(d,50));
         return d;
     }
     static byte[] decrypt(int d, int r,short[] cipherText){

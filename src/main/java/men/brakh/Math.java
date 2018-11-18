@@ -10,7 +10,7 @@ public class Math {
         }
         return res;
     }
-    //  return array [d, a, b] such that d = gcd(p, q), ap + bq = d
+    //  return array [d, a, b] such that d = gcd(p, q), ap + b q = d
     static int[] gcd(int p, int q) {
         if (q == 0)
             return new int[] { p, 1, 0 };
@@ -30,11 +30,11 @@ public class Math {
         int y1 = 1;
         int d2,q,x2,y2;
         while (d1>1){
-            q = d0/d1;
-            d2 = d0%d1;
+            q = d0/d1;// делим нацело
+            d2 = d0%d1;//остаток от деления
             x2 = x0-q*x1;
             y2 = y0-q*y1;
-            d0 = d1; d1 = d2;
+            d0 = d1; d1 = d2; //a = b; b = остаток от деления
             x0 = x1; x1=x2;
             y0 = y1; y1=y2;
         }
@@ -52,6 +52,17 @@ public class Math {
         if (n > 1)
             result -= result / n;
         return result;
+    }
+    public static boolean isPrime(int num)
+    {
+        if (num == 2)
+            return true;
+        if (num < 2 || num % 2 == 0)
+            return false;
+        for (int i = 3; i * i <= num; i += 2)
+            if (num % i == 0)
+                return false;
+        return true;
     }
     public static long gcd(long a, long b){
         if(b==0)
